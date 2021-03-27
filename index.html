@@ -6,7 +6,7 @@
     <style>
       body {
         margin: 0;
-        background: #000000;
+        background: #000000 !important;
         display: flex;
         align-items: center;
         height: 100vh;
@@ -67,7 +67,9 @@
       .verde.dark {
         background: #5caf18;
       }
-
+      .very-good {
+        box-shadow: 0px 0px 33px 4px rgba(0,255,0,0.81);
+      }
       .btn-start {
         width: 400px;
         height: 100px;
@@ -75,7 +77,7 @@
         color: #48ff00;
         font-size: 2.5rem;
         position: absolute;
-        top: calc(50% - 50px);
+        top: calc(60% - 50px);
         left: calc(50% - 200px);
       }
 
@@ -86,14 +88,34 @@
           font-family: Arial;
       }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
   </head>
   <body>
-    <div class="gameboard">
-      <div id="celeste" class="color celeste left" data-color="celeste"></div>
-      <div id="violeta" class="color violeta right" data-color="violeta"></div>
-      <div id="naranja" class="color naranja left" data-color="naranja"></div>
-      <div id="verde" class="color verde right" data-color="verde"></div>
-      <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+    <div class="container">
+      <div class="row mb-5">
+          <h1 class="mx-auto text-white">Simon Dice</h1>
+      </div>
+      <div class="row ">
+          <div class="col text-white mx -auto">
+            <label  for="level">Nivel:</label>
+            <input id="level" type="text" name="level" value="10">  
+          </div>
+          <div class="col">
+            <div class="text-white  mx -auto">
+              PUNTOS: <span id="puntos">0</span> 
+            </div>
+          </div>
+
+      </div>
+      <div class="gameboard ">
+        <div id="celeste" class="color celeste left" data-color="celeste"></div>
+        <div id="violeta" class="color violeta right" data-color="violeta"></div>
+        <div id="naranja" class="color naranja left" data-color="naranja"></div>
+        <div id="verde" class="color verde right" data-color="verde"></div>
+        <button id="btnEmpezar" class="btn-start" onclick="empezarJuego()">Empezar a jugar!</button>
+      </div>
     </div>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script>
@@ -102,7 +124,10 @@
       const naranja = document.getElementById('naranja')
       const verde = document.getElementById('verde')
       const btnEmpezar = document.getElementById('btnEmpezar')
-      const ULTIMO_NIVEL=10
+      const inputLevel = $('#level')
+      const spanPuntos = $('#puntos')
+      let ULTIMO_NIVEL
+
 
       class Juego {
         constructor() {
@@ -118,6 +143,8 @@
           this.elegirColor = this.elegirColor.bind(this)  
           this.siguienteNivel = this.siguienteNivel.bind(this)
           this.toggleBtnEmpezar()
+          ULTIMO_NIVEL=parseInt(inputLevel.val(),10)
+          spanPuntos.html(0)
           this.nivel = 1
           // objeto con los botones
           this.colores = {
@@ -129,11 +156,13 @@
         }
 
         toggleBtnEmpezar(){
-            if(btnEmpezar.classList.contains('hide'))
+            if(btnEmpezar.classList.contains('hide')){
                 btnEmpezar.classList.remove('hide')
-            else
+               inputLevel.prop('disabled',false)              
+            }else{
                 btnEmpezar.classList.add('hide')
-            
+               inputLevel.prop('disabled',true)
+            }
  
         }
         
@@ -217,8 +246,10 @@
             if(numeroColor === this.secuencia[this.subnivel]){ //elige bien
                 this.subnivel++
                 if(this.subnivel === this.nivel){
-                    this.nivel++
+                    spanPuntos.html(this.nivel++)
                     this.eliminarEventosClick()
+                    $(".gameboard")[0].classList.add('very-good')
+                    setTimeout(()=>$(".gameboard")[0].classList.remove('very-good'),500)
                     if(this.nivel === (ULTIMO_NIVEL+1)){
                         this.ganoElJuego()
                     }else{
